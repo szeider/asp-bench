@@ -21,8 +21,8 @@ jobs:
           CHANGED=$(git diff --name-only --diff-filter=d "origin/${{ github.base_ref }}...HEAD" -- problems/)
           BAD=0
           for f in $CHANGED; do
-            if [[ ! "$f" =~ ^problems/t3_[0-9]{3}_[a-z0-9_]+\.zip$ ]]; then
-              echo "::error::Forbidden file under problems/: $f (only t3_NNN_slug.zip archives are allowed)"
+            if [[ ! "$f" =~ ^problems/t3_[0-9]{3}_[a-z][a-z0-9_]{0,23}\.zip$ ]]; then
+              echo "::error::Forbidden file under problems/: $f (only t3_NNN_slug.zip archives are allowed; slug is lowercase snake_case, max 24 chars)"
               BAD=1
             fi
           done

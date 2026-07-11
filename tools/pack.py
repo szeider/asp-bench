@@ -66,9 +66,11 @@ def check_metadata(subdir: Path, errors: list) -> dict:
     number = meta.get("number")
     if not isinstance(number, int) or not (0 <= number <= 999):
         errors.append("metadata.yml: 'number' must be an integer 0-999 (0 is reserved for the template)")
+    import re
     slug = meta.get("slug", "")
-    if not isinstance(slug, str) or not slug or not all(c.islower() or c.isdigit() or c == "_" for c in slug):
-        errors.append("metadata.yml: 'slug' must be non-empty lowercase [a-z0-9_]")
+    if not isinstance(slug, str) or not re.fullmatch(r"[a-z][a-z0-9_]{0,23}", slug):
+        errors.append("metadata.yml: 'slug' must be lowercase snake_case, "
+                      "1-24 chars, starting with a letter ([a-z][a-z0-9_]{0,23})")
     if not isinstance(meta.get("title"), str) or not meta.get("title"):
         errors.append("metadata.yml: 'title' must be a non-empty string")
     authors = meta.get("authors")

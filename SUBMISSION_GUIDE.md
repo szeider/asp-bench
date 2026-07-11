@@ -69,7 +69,7 @@ easy) example.
 | Field | Requirement |
 |---|---|
 | `number` | Integer 1–999: next free number in INDEX.md (maintainer may renumber on merge) |
-| `slug` | Lowercase `[a-z0-9_]`; archive is named `t3_NNN_slug.zip` |
+| `slug` | Lowercase snake_case, 1–24 chars, starts with a letter (`[a-z][a-z0-9_]{0,23}`); archive is named `t3_NNN_slug.zip` |
 | `title` | Short public title (must not spoil the solution) |
 | `authors` | List of names, as they should appear in INDEX.md and Zenodo |
 | `contact` | Email address for review questions |

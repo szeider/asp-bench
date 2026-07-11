@@ -1,6 +1,6 @@
 # ASP-Bench Tier 3 submission metadata — see SUBMISSION_GUIDE.md for field spec.
 number: 0                        # next free number in INDEX.md (000 is reserved for this template)
-slug: example_vertex_cover       # lowercase [a-z0-9_], used in the archive name t3_NNN_slug.zip
+slug: example_vertex_cover       # lowercase snake_case, max 24 chars, used in the archive name t3_NNN_slug.zip
 title: "Example: Minimum Vertex Cover"
 authors:
   - Stefan Szeider
