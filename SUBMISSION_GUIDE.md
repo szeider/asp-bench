@@ -98,9 +98,10 @@ novelty and quality and runs the baseline-agent hardness test (see README).
 
 ## Optional: baseline hardness self-test (recommended)
 
-The hardness criterion (see README) is operational: the Tier-3 reference
-agent should fail at least one of three independent runs, or need clearly
-above-average iterations. The reference agent is the ASP-Bench coder from the
+Hardness is measured, not asserted (see README): accepted problems are
+**Tier-3 candidates**, and each candidate's three-run record with the
+reference agent (successes out of 3, execution calls, tokens, time) is
+published in INDEX.md. The reference agent is the ASP-Bench coder from the
 paper with `openai/gpt-5.6-sol` as the model (pinned in
 `tools/models/gpt56sol.json`; temperature 0.0). You can run the test yourself
 before submitting:
@@ -122,19 +123,23 @@ execution kernel, as in the paper's experiments.)
 Repeat three times (move `problem_code.py` and `problem.jsonl` aside between
 runs). Interpreting the outcome:
 
-- **Solved 3/3 with few iterations** — not Tier 3. For calibration: on the
-  10 hardest Tier-1/2 problems the reference model averages 4.6
-  `python_exec` calls (range 3–6) and ~120k input tokens per run, solving
-  9 of 10. A run's exact counts are in the `statistics` event at the end of
-  the transcript: `grep '"statistics"' problem.jsonl`.
-- **Failed at least one run, or consistently needed far more iterations** —
-  a good Tier-3 candidate. Failures include wrong answers, invalid or
-  suboptimal solutions, and wrongly declaring an instance infeasible (the
-  reference model's one observed failure mode on Tier 2).
+- **Solved 3/3 with 3–6 iterations** — Tier-2 territory, not a Tier-3
+  candidate. For calibration: on the 10 hardest Tier-1/2 problems the
+  reference model averages 4.6 `python_exec` calls (range 3–6) and ~120k
+  input tokens per run. A run's exact counts are in the `statistics` event
+  at the end of the transcript: `grep '"statistics"' problem.jsonl`.
+- **Failed at least one run** — the gold standard. Failures include wrong
+  answers, invalid or suboptimal solutions, and wrongly declaring an
+  instance infeasible.
+- **Solved, but at a multiple of the Tier-2 effort envelope** (e.g., 15+
+  calls, hundreds of thousands of input tokens, several hundred seconds) —
+  a legitimate candidate; the published record lets the community see where
+  the goalpost settles.
 
-Report your results in the `notes` field of `metadata.yml`, e.g.
-`"baseline self-test: 1/3 solved, executions 14/26/timeout"`. This is the
-single most useful piece of information for the review.
+Report your run results in the `notes` field of `metadata.yml`, e.g.
+`"self-test: 3/3 solved, executions 18/24/18, ~400k input tokens/run"`.
+This is the single most useful piece of information for the review; the
+maintainer's official three-run record is published in INDEX.md.
 
 Two practical notes. Each run consumes LLM API tokens at your expense.
 And since the point of the benchmark is to feed problems to LLM systems,
