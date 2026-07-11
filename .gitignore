@@ -2,6 +2,9 @@
 work/
 *.plain/
 
+# Created by the optional hardness self-test (coder --init clingo).
+coder-examples/
+
 __pycache__/
 *.pyc
 .venv/

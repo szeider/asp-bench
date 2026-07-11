@@ -96,6 +96,54 @@ archive):
 Checks 1–5 are necessary, not sufficient: the maintainer additionally reviews
 novelty and quality and runs the baseline-agent hardness test (see README).
 
+## Optional: baseline hardness self-test (recommended)
+
+The hardness criterion (see README) is operational: the Tier-3 reference
+agent should fail at least one of three independent runs, or need clearly
+above-average iterations. The reference agent is the ASP-Bench coder from the
+paper with `openai/gpt-5.6-sol` as the model (pinned in
+`tools/models/gpt56sol.json`; temperature 0.0). You can run the test yourself
+before submitting:
+
+```bash
+pip install agentic-cli-coder
+coder --init clingo        # creates coder-examples/clingo/clingo.md (the project prompt)
+# put your OpenRouter API key in ~/.config/coder/.env (or pass --api-key)
+cd work/my_problem
+coder --with clingo --task problem.md \
+  --project ../../coder-examples/clingo/clingo.md \
+  --model ../../tools/models/gpt56sol.json
+python problem_code.py | python ground_truth.py
+```
+
+(`--with clingo` is essential: it loads the clingo library into the agent's
+execution kernel, as in the paper's experiments.)
+
+Repeat three times (move `problem_code.py` and `problem.jsonl` aside between
+runs). Interpreting the outcome:
+
+- **Solved 3/3 with few iterations** — not Tier 3. For calibration: on the
+  10 hardest Tier-1/2 problems the reference model averages 4.6
+  `python_exec` calls (range 3–6) and ~120k input tokens per run, solving
+  9 of 10. A run's exact counts are in the `statistics` event at the end of
+  the transcript: `grep '"statistics"' problem.jsonl`.
+- **Failed at least one run, or consistently needed far more iterations** —
+  a good Tier-3 candidate. Failures include wrong answers, invalid or
+  suboptimal solutions, and wrongly declaring an instance infeasible (the
+  reference model's one observed failure mode on Tier 2).
+
+Report your results in the `notes` field of `metadata.yml`, e.g.
+`"baseline self-test: 1/3 solved, executions 14/26/timeout"`. This is the
+single most useful piece of information for the review.
+
+Two practical notes. Each run consumes LLM API tokens at your expense.
+And since the point of the benchmark is to feed problems to LLM systems,
+sending the statement through an API is expected — but use endpoints that do
+not train on inputs (the Anthropic API does not by default; on OpenRouter,
+restrict routing to providers with a no-training policy), and never paste
+problem content into consumer chat interfaces, which may retain and train on
+conversations.
+
 ## Leak policy
 
 Plaintext problem content must never appear anywhere GitHub stores publicly:

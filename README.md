@@ -37,10 +37,17 @@ releases, and in any follow-up publication.
   *any* proposed solution — not string comparison against one reference answer.
 - An **example solution** using the clingo Python API, proving the problem is
   well-posed (for optimization problems: proving the stated optimum is attained).
-- **Hard**: the ASP-Bench baseline agent (Claude Sonnet 4.5 with the `clingo.md`
-  project prompt, see the paper) should fail at least one of three independent
-  runs, or require clearly above-median reasoning iterations. The maintainer
+- **Hard**: the Tier-3 **reference agent** — the ASP-Bench coder with the
+  `clingo.md` project prompt (see the paper) running **`openai/gpt-5.6-sol`**
+  (config: [`tools/models/gpt56sol.json`](tools/models/gpt56sol.json)) —
+  should fail at least one of three independent runs, or require clearly
+  above-average reasoning iterations. For calibration: this model solves 9 of
+  the 10 hardest Tier-1/2 problems in 3–6 iterations each. The maintainer
   runs this test during review; borderline cases are discussed in the PR.
+  You can run the same test yourself before submitting — see the optional
+  hardness self-test in [SUBMISSION_GUIDE.md](SUBMISSION_GUIDE.md).
+  (The paper's Claude Sonnet 4.5 baseline is superseded for Tier-3 purposes;
+  the reference model will be re-pinned as the frontier advances.)
 
 See [SUBMISSION_GUIDE.md](SUBMISSION_GUIDE.md) for the complete specification.
 
