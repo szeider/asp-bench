@@ -1,0 +1,3 @@
+pyyaml
+pyzipper
+clingo==5.8.*

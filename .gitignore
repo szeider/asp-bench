@@ -1,0 +1,9 @@
+# Plaintext working area for submissions — never committed.
+work/
+*.plain/
+
+__pycache__/
+*.pyc
+.venv/
+venv/
+.DS_Store

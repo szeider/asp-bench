@@ -1,0 +1,13 @@
+# ASP-Bench Tier 3 submission metadata — see SUBMISSION_GUIDE.md for field spec.
+number: 0                        # next free number in INDEX.md (000 is reserved for this template)
+slug: example_vertex_cover       # lowercase [a-z0-9_], used in the archive name t3_NNN_slug.zip
+title: "Example: Minimum Vertex Cover"
+authors:
+  - Stefan Szeider
+contact: sz@ac.tuwien.ac.at
+aspects: [OPT]                   # non-empty subset of OPT, TEMP, DEFAULT, RESOURCE, RECURSIVE, SPATIAL, QUANT
+optimization: true               # if true, optimal_value is required and ground_truth.py
+optimal_value: 4                 # must define EXPECTED_OPTIMAL with the same value
+clingo_version: "5.8.0"          # 5.8.x version the example solution was tested with
+license: Apache-2.0              # must be exactly this (contribution license grant)
+notes: "Template example; far too easy for Tier 3 — it only demonstrates the format."

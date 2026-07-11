@@ -1,0 +1,81 @@
+name: tier3
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  # PRs may only add/modify encrypted archives under problems/ — this is the
+  # first line of defense against accidental plaintext commits.
+  guard:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Only encrypted blobs under problems/
+        run: |
+          git fetch origin "${{ github.base_ref }}"
+          CHANGED=$(git diff --name-only --diff-filter=d "origin/${{ github.base_ref }}...HEAD" -- problems/)
+          BAD=0
+          for f in $CHANGED; do
+            if [[ ! "$f" =~ ^problems/t3_[0-9]{3}_[a-z0-9_]+\.zip$ ]]; then
+              echo "::error::Forbidden file under problems/: $f (only t3_NNN_slug.zip archives are allowed)"
+              BAD=1
+            fi
+          done
+          exit $BAD
+
+  # Decrypt each changed archive and run the full pack.py checks on it.
+  # Note: this executes contributor code, which is acceptable on the
+  # pull_request trigger (isolated runner, no secrets exposed). Tool output
+  # is pass/fail only; problem content is never echoed to the log.
+  validate:
+    if: github.event_name == 'pull_request'
+    needs: guard
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r tools/requirements.txt
+      - name: Verify changed submissions
+        run: |
+          git fetch origin "${{ github.base_ref }}"
+          CHANGED=$(git diff --name-only --diff-filter=d "origin/${{ github.base_ref }}...HEAD" -- problems/)
+          if [ -z "$CHANGED" ]; then
+            echo "No archives changed."
+            exit 0
+          fi
+          i=0
+          for z in $CHANGED; do
+            i=$((i+1))
+            echo "=== $z ==="
+            python tools/unpack.py "$z" -o "/tmp/sub_$i"
+            python tools/pack.py verify "/tmp/sub_$i"
+          done
+
+  # Tooling self-test on every push and PR: insert the canary into a copy of
+  # the template, then run the full pack -> unpack -> verify roundtrip.
+  selftest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r tools/requirements.txt
+      - name: Pack/unpack roundtrip on the template
+        run: |
+          cp -r template /tmp/tpl
+          CAN=$(python tools/pack.py canary)
+          printf '\n%s\n' "$CAN" >> /tmp/tpl/problem.md
+          printf '\n# %s\n' "$CAN" >> /tmp/tpl/ground_truth.py
+          python tools/pack.py pack /tmp/tpl -o /tmp/out
+          python tools/unpack.py /tmp/out/t3_000_example_vertex_cover.zip -o /tmp/roundtrip
+          python tools/pack.py verify /tmp/roundtrip
