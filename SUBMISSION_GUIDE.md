@@ -14,6 +14,46 @@ protected content: they exist in the repository only inside the archive.
 Start from `template/`, which contains a complete working (but deliberately
 easy) example.
 
+## Core rule: the solution is a clingo encoding, not a Python search
+
+Tier 3 tests one specific skill — modelling a hard, two-level problem *in ASP*.
+The solution must therefore be a **clingo encoding**. Python is allowed only as
+a thin harness around it.
+
+**Allowed.** Python may (a) read the instance and print the result JSON, and
+(b) drive clingo through a fixed, mechanical loop that varies a single numeric
+bound — e.g. lower a target from an upper bound and re-solve the *same* encoding
+until UNSAT to find an optimum. Across such calls Python may read only a solve's
+**SAT/UNSAT status** and its **objective/answer values** (to format output or
+set the next bound).
+
+**Not allowed.** Python may not take the *contents* of one answer set — a
+specific counterexample, candidate, core, or cut — and use it to build the
+program of a later solve. That single move is what turns a declarative encoding
+into a Python search algorithm, and it is exactly how CEGAR, implicit hitting
+sets, Benders decomposition, and column generation work. Equally out:
+enumerating or branching over candidates in Python and checking each with clingo
+(guess-and-check); implementing the optimisation/search logic in Python with
+clingo as a single-level (NP or co-NP) oracle; or hard-coding a result found
+during development. All problem-specific reasoning — including the ∀-level "no
+better solution exists" argument — must happen **inside** the ASP program, via
+`#minimize`, disjunction/saturation, or constraints.
+
+**The reviewer test.** Keep only one `solve()` call (plus any pure bound-sweep
+loop) and ask: does the ASP program handed to that call, on its own, decide the
+problem? If correctness instead depended on Python combining the *contents* of
+several different solves, the solution is a Python search and does not qualify.
+
+**How this is scored.** `pack.py` runs the example `solution.py` and checks its
+output, but *cannot* judge method automatically — the maintainer reads the code.
+A submission whose `solution.py` is not a clingo encoding in the above sense is
+rejected even if its output is correct. In the reference-agent evaluation the
+agent's saved code (`problem_code.py`) is judged the same way: a run counts as
+solved only if that code (i) reruns and passes the ground truth **and** (ii) is
+a clingo encoding; a correct answer produced by a Python search is recorded as a
+**failure**. Every `problem.md` states this constraint so the evaluated agent
+sees it (the standard "Solution Requirement" block in `template/problem.md`).
+
 ## problem.md
 
 - **At most 1,000 words and 12 KB.** Tier 1–2 problems range from 158 to 835
@@ -63,6 +103,10 @@ easy) example.
 - Must finish end-to-end within **60 seconds**; the problem must be designed so
   that each individual clingo solve call stays within **20 seconds** on
   commodity hardware (the ASP-Bench design limit).
+- **Must be a clingo encoding, not a Python search** — see "Core rule" above.
+  The example solution demonstrates that the problem admits a genuine ASP
+  encoding within the limits; a Python CEGAR/hitting-set/branch-and-bound
+  wrapper around clingo does not qualify, even if its output is correct.
 
 ## metadata.yml
 
@@ -129,8 +173,11 @@ runs). Interpreting the outcome:
   input tokens per run. A run's exact counts are in the `statistics` event
   at the end of the transcript: `grep '"statistics"' problem.jsonl`.
 - **Failed at least one run** — the gold standard. Failures include wrong
-  answers, invalid or suboptimal solutions, and wrongly declaring an
-  instance infeasible.
+  answers, invalid or suboptimal solutions, wrongly declaring an instance
+  infeasible, and — per the Core rule — a correct answer produced by a Python
+  search (CEGAR / hitting sets / branch-and-bound / guess-and-check) rather
+  than a clingo encoding. Read each saved `problem_code.py` to classify the
+  method; a non-encoding solve is a failed run, not a solved one.
 - **Solved, but at a multiple of the Tier-2 effort envelope** (e.g., 15+
   calls, hundreds of thousands of input tokens, several hundred seconds) —
   a legitimate candidate; the published record lets the community see where

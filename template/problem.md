@@ -34,5 +34,19 @@ where `cover` lists the junctions on which guards are placed, in any order.
 - The number of guards must be **minimum** (this is an optimization problem;
   a feasible but suboptimal placement is invalid).
 
+## Solution Requirement
+
+*(Standard block — include verbatim in every Tier-3 problem.)*
+
+Solve this with a **clingo (ASP) encoding**, not a Python search. Your program
+may use Python only to read the instance, print the JSON result, and — if
+needed — re-run the *same* encoding while sweeping a single numeric bound
+(e.g. lower a target until UNSAT). All search and all "no better solution
+exists" reasoning must be done by clingo inside the ASP program (`#minimize`,
+disjunction/saturation, constraints). Computing counterexamples, cores, or
+candidates in Python and feeding them back into clingo (CEGAR, hitting sets,
+branch-and-bound, guess-and-check) does **not** count, even if the printed
+answer is correct.
+
 <!-- Replace this comment with the canary line: run `python tools/pack.py canary`
      and paste its output verbatim as the last line of this file. -->
