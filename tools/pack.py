@@ -252,9 +252,12 @@ def main():
     if args.cmd == "canary":
         print(canary())
         return 0
+    # Resolve to an absolute path: verify/pack run solution.py with
+    # cwd set to the submission dir, so a relative dir would be looked
+    # up twice (cwd/dir/solution.py) and fail to open.
     if args.cmd == "verify":
-        return 0 if verify(args.dir) is not None else 1
-    return pack(args.dir, args.outdir)
+        return 0 if verify(args.dir.resolve()) is not None else 1
+    return pack(args.dir.resolve(), args.outdir.resolve())
 
 
 if __name__ == "__main__":
