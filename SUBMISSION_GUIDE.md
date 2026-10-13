@@ -151,11 +151,11 @@ paper with `openai/gpt-5.6-sol` as the model (pinned in
 before submitting:
 
 ```bash
-pip install agentic-cli-coder
-coder --init clingo        # creates coder-examples/clingo/clingo.md (the project prompt)
+# agentic-python-coder needs Python 3.13; uvx picks or downloads it automatically
+uvx --from agentic-python-coder coder --init clingo   # creates coder-examples/clingo/clingo.md (the project prompt)
 # put your OpenRouter API key in ~/.config/coder/.env (or pass --api-key)
 cd work/my_problem
-coder --with clingo --task problem.md \
+uvx --from agentic-python-coder coder --with clingo --task problem.md \
   --project ../../coder-examples/clingo/clingo.md \
   --model ../../tools/models/gpt56sol.json
 python problem_code.py | python ground_truth.py
