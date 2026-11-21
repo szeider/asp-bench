@@ -21,3 +21,4 @@ Tier-1/2 problems 3/3 with 3–6 calls, ~120k tokens, ~2 minutes per run.
 | 000 | Example: Minimum Vertex Cover | Stefan Szeider | OPT | yes | — (unencrypted, see `template/`) | — | template |
 | 001 | Wildfire Response | Stefan Szeider | OPT, TEMP, RESOURCE, SPATIAL, RECURSIVE | yes | `61abac93513cae78` | solved 3/3 · calls 18/24/18 · in-tokens 369k/507k/347k · time 637/871/584 s | candidate |
 | 002 | Jamming the Valley Network | Stefan Szeider | OPT, QUANT | yes | `37c324ce53faa6b5` | solved 0/3 (runs 1–2 output-correct but not an ASP encoding — Python CEGAR; run 3 timeout) · calls 6/6/— · in-tokens 140k/144k/— · time 136/866/1200 s | candidate |
+| 003 | A Joint Representative Committee | Haoyang Su | OPT,QUANT | yes | `85a923c33bd6fb7d` | — | submitted |
